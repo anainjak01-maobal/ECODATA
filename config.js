@@ -8,5 +8,5 @@ window.ED_CONFIG = {
 
   /* Dirección de la aplicación web de Apps Script (termina en /exec, ver LEEME.txt).
      Mientras esté vacía, el panel muestra los datos de respaldo y el registro no funciona. */
-  REGISTRO: ""
+  REGISTRO: "https://script.google.com/macros/s/AKfycbwMewcTBGBLso-QyTfehDsiX35TGFKDAwXh4Q2shyjlJrjfMZIuUOM5-UjdlNBCHi3G1w/exec"
 };
