@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Public+Sans:wght@400;600;700&display=swap"/>
-<link rel="stylesheet" href="ecodata.css?v=3"/>
+<link rel="stylesheet" href="ecodata.css?v=4"/>
 </head>
 <body>
 
@@ -173,7 +173,7 @@
 
 <script src="config.js?v=2"></script>
 <script src="datos_base.js?v=2"></script>
-<script src="ecodata.js?v=2"></script>
+<script src="ecodata.js?v=4"></script>
 <script>
 (function () {
   "use strict";
@@ -197,9 +197,9 @@
     var pos = { "Portería": [120, 150], "Esquina": [350, 130], "Patio": [210, 285] };
     var out = '<rect x="6" y="6" width="508" height="368" rx="22" fill="none" style="stroke:var(--rule)" stroke-dasharray="4 6"/>';
     out += '<text x="22" y="34" style="fill:var(--ink2);font-size:13px;font-family:Public Sans,system-ui,sans-serif">Calle y entrada de la escuela</text>';
-    pp.forEach(function (p) {
+    pp.forEach(function (p, i) {
       var c = pos[p.punto], r = Math.max(14, Math.sqrt(p.total) * k), esq = p.punto === "Esquina";
-      out += '<g><title>' + ED.esc(p.punto + ": " + p.total + " bolsas en 10 tardes") + "</title>";
+      out += '<g class="burbuja-g" style="--d:' + (i * 160) + 'ms"><title>' + ED.esc(p.punto + ": " + p.total + " bolsas en 10 tardes") + "</title>";
       out += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + r + '" style="fill:' + (esq ? "var(--accent)" : "var(--neutral)") + ';fill-opacity:' + (esq ? ".92" : ".85") + '"/>';
       out += '<text x="' + c[0] + '" y="' + (c[1] + 6) + '" text-anchor="middle" style="fill:' + (esq ? "#fff" : "var(--fg)") + ';font:700 ' + (esq ? 34 : 22) + 'px Fraunces,Georgia,serif">' + p.total + "</text>";
       out += '<text x="' + c[0] + '" y="' + (c[1] + r + 20) + '" text-anchor="middle" style="fill:var(--fg);font:600 14px Public Sans,system-ui,sans-serif">' + ED.esc(p.punto) + "</text></g>";
@@ -209,10 +209,29 @@
     var r = ED.resumen(datos);
     var quema = r.quemaDias;
     $("cifras").innerHTML =
-      '<div><strong>' + ED.entero(r.tardes) + '</strong> tardes</div>' +
-      '<div><strong>' + ED.entero(r.bolsas) + '</strong> bolsas</div>' +
-      '<div><strong>' + ED.entero(quema) + '</strong> días con quema</div>' +
-      '<div><strong>3</strong> puntos</div>';
+      '<div><strong data-to="' + r.tardes + '">0</strong> tardes</div>' +
+      '<div><strong data-to="' + r.bolsas + '">0</strong> bolsas</div>' +
+      '<div><strong data-to="' + quema + '">0</strong> días con quema</div>' +
+      '<div><strong data-to="3">0</strong> puntos</div>';
+    contarCifras();
+  }
+
+  /* Sube cada cifra hasta su valor. Sin movimiento si el sistema lo pide. */
+  function contarCifras() {
+    var reducir = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll("#cifras strong").forEach(function (el, i) {
+      var hasta = Number(el.getAttribute("data-to")) || 0;
+      if (reducir) { el.textContent = ED.entero(hasta); return; }
+      var inicio = null, dur = 900, demora = 300 + i * 120;
+      function paso(t) {
+        if (inicio === null) inicio = t + demora;
+        if (t < inicio) { requestAnimationFrame(paso); return; }
+        var p = Math.min(1, (t - inicio) / dur);
+        el.textContent = ED.entero(hasta * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(paso);
+      }
+      requestAnimationFrame(paso);
+    });
   }
 
   function kpi(lbl, val, det, destacado) {

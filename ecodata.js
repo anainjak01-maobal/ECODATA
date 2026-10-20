@@ -161,7 +161,7 @@
       var fill = it.destacado ? "var(--accent)" : "var(--neutral)";
       out += '<g><title>' + esc(it.etiqueta + ": " + entero(it.valor) + " " + (it.unidad || "")) + "</title>";
       out += '<text x="0" y="' + (y + 25) + '">' + esc(it.etiqueta) + "</text>";
-      out += '<rect x="' + left + '" y="' + (y + 8) + '" width="' + Math.max(bw, 2) + '" height="26" style="fill:' + fill + '"/>';
+      out += '<rect class="barra-h" style="animation-delay:' + (i * 90) + 'ms;fill:' + fill + '" x="' + left + '" y="' + (y + 8) + '" width="' + Math.max(bw, 2) + '" height="26"/>';
       out += '<text x="' + (left + bw + 8) + '" y="' + (y + 27) + '" style="font-weight:' + (it.destacado ? 700 : 400) + '">' + esc(entero(it.valor)) + "</text></g>";
     });
     return svg(W, H, out, nombre);
@@ -184,7 +184,7 @@
         if (!r) return;
         if (r.quema) quema = true;
         var y = escala(r.bolsas), fill = p === "Esquina" ? "var(--accent)" : p === "Patio" ? "var(--neutral-2)" : "var(--neutral)";
-        out += '<rect x="' + (x0 + j * bw) + '" y="' + y + '" width="' + (bw - 1) + '" height="' + (base - y) + '" style="fill:' + fill + '"><title>' +
+        out += '<rect class="barra-v" style="animation-delay:' + (i * 60 + j * 40) + 'ms;fill:' + fill + '" x="' + (x0 + j * bw) + '" y="' + y + '" width="' + (bw - 1) + '" height="' + (base - y) + '"><title>' +
           esc(p + " · " + fechaLarga(f) + ": " + r.bolsas + " bolsas" + (r.quema ? " · quema vista" : "")) + "</title></rect>";
       });
       out += '<text class="eje" x="' + cx + '" y="' + (base + 16) + '" text-anchor="middle">' + fechaCorta(f) + "</text>";
@@ -269,7 +269,7 @@
     items.forEach(function (it, i) {
       var x = left + 14 + i * (bw + 28), h = (base - top) * (it.valor || 0) / max;
       out += '<g><title>' + esc(it.etiqueta + ": promedio " + dec(it.valor) + " bolsas (" + it.n + " registros)") + "</title>";
-      out += '<rect x="' + x + '" y="' + (base - h) + '" width="' + bw + '" height="' + h + '" style="fill:' + (it.destacado ? "var(--accent)" : "var(--neutral)") + '"/>';
+      out += '<rect class="barra-v" style="animation-delay:' + (i * 120) + 'ms;fill:' + (it.destacado ? "var(--accent)" : "var(--neutral)") + '" x="' + x + '" y="' + (base - h) + '" width="' + bw + '" height="' + h + '"/>';
       out += '<text x="' + (x + bw / 2) + '" y="' + (base - h - 8) + '" text-anchor="middle" style="font-weight:700">' + dec(it.valor) + "</text>";
       out += '<text class="eje" x="' + (x + bw / 2) + '" y="' + (base + 20) + '" text-anchor="middle">' + esc(it.etiqueta) + "</text>";
       out += '<text class="eje" x="' + (x + bw / 2) + '" y="' + (base + 38) + '" text-anchor="middle">' + it.n + " registros</text></g>";

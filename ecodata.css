@@ -1,6 +1,7 @@
 /* EcoData · estilos compartidos. Papel, tinta verde oscuro y terracota para destacar la esquina.
    Cada color es un token; el tema oscuro los redefine. */
 :root {
+  --ease: cubic-bezier(.2, .8, .2, 1);
   --bg: #f6f1e7;
   --card: #fffdf8;
   --card-2: #f0e9dc;
@@ -209,3 +210,29 @@ footer.pie { font: 13px/1.5 "Segoe UI", system-ui, sans-serif; color: var(--ink2
 .top .nav { margin-top: 0; }
 .top .nav a { color: #d4e6dc; }
 .portada + .top { margin-top: 0; }
+
+/* Transiciones: solo para dar sentido al cambio. Se desactivan si el sistema pide menos movimiento. */
+@keyframes crece-v { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes crece-h { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes burbuja-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes aparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.barra-v { transform-box: fill-box; transform-origin: 50% 100%; animation: crece-v .7s var(--ease) both; }
+.barra-h { transform-box: fill-box; transform-origin: 0 50%; animation: crece-h .8s var(--ease) both; }
+.burbuja-g circle { transform-box: fill-box; transform-origin: center; animation: burbuja-in .8s var(--ease) both; animation-delay: var(--d, 0ms); }
+.burbuja-g text { animation: aparece .6s var(--ease) both; animation-delay: calc(var(--d, 0ms) + 250ms); }
+.kpis .kpi { animation: aparece .6s var(--ease) both; }
+.kpis .kpi:nth-child(2) { animation-delay: 80ms; }
+.kpis .kpi:nth-child(3) { animation-delay: 160ms; }
+.kpis .kpi:nth-child(4) { animation-delay: 240ms; }
+.nav a { transition: color .2s, border-color .2s; }
+.btn { transition: background-color .2s, color .2s, transform .15s, border-color .2s; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.kpi { transition: border-color .25s; }
+.kpi:hover { border-color: var(--ink-soft); }
+.tabla td, .tabla th { transition: background-color .15s; }
+select, input { transition: border-color .2s, box-shadow .2s; }
+select:focus-visible, input:focus-visible { box-shadow: 0 0 0 3px var(--accent-soft); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
