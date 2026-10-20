@@ -16,7 +16,7 @@ function doGet(e) {
   var q = (e && e.parameter) || {};
   if (q.datos) {
     try {
-      return salida({ ok: true, datos: leerDatos() });
+      return salida({ ok: true, datos: leerDatos(true) });
     } catch (err) {
       return salida({ ok: false, error: "No pude leer la hoja " + HOJA + ": " + err.message });
     }
@@ -33,6 +33,7 @@ function doPost(e) {
     if (String(p.clave || "") !== CLAVE) return salida({ ok: false, error: "Clave incorrecta." });
     var accion = String(p.accion || "registrar");
     if (accion === "verificar") return salida({ ok: true, mensaje: "Clave correcta." });
+    if (accion === "listar") return salida({ ok: true, datos: leerDatos(true) });
     if (accion === "registrar") return salida(registrar(p));
     if (accion === "actualizar") return salida(actualizar(p));
     if (accion === "borrar") return salida(borrar(p));
@@ -64,7 +65,7 @@ function texto(v) {
   return String(v == null ? "" : v).trim();
 }
 
-function leerDatos() {
+function leerDatos(conNombres) {
   var h = hoja();
   var ultima = h.getLastRow();
   if (ultima < 2) return [];
@@ -72,7 +73,8 @@ function leerDatos() {
   return filas.filter(function (f) { return texto(f[0]) !== ""; }).map(function (f) {
     return {
       id: texto(f[0]), fecha: texto(f[1]), dia: texto(f[2]), punto: texto(f[3]),
-      bolsas: Number(f[4]) || 0, quema: texto(f[5]) === "Sí", olor: texto(f[6]), polvo: texto(f[7])
+      bolsas: Number(f[4]) || 0, quema: texto(f[5]) === "Sí", olor: texto(f[6]), polvo: texto(f[7]),
+      anoto: conNombres ? texto(f[8]) : undefined
     };
   });
 }
