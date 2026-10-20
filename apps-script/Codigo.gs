@@ -60,7 +60,7 @@ function hoja() {
 }
 
 function texto(v) {
-  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  if (v instanceof Date) return Utilities.formatDate(v, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
   return String(v == null ? "" : v).trim();
 }
 
