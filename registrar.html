@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>EcoData · Registro del equipo</title>
-<link rel="stylesheet" href="ecodata.css?v=2"/>
+<link rel="stylesheet" href="ecodata.css?v=3"/>
 </head>
 <body>
 
@@ -116,12 +116,8 @@
 (function () {
   "use strict";
   var ED = window.ED, $ = function (id) { return document.getElementById(id); };
-  var CLAVE_KEY = "ecodata-clave";
   var clave = "", datos = [], enEdicion = null;
 
-  function leerClave() { try { return localStorage.getItem(CLAVE_KEY) || ""; } catch (e) { return ""; } }
-  function guardarClave(c) { try { localStorage.setItem(CLAVE_KEY, c); } catch (e) {} }
-  function borrarClave() { try { localStorage.removeItem(CLAVE_KEY); } catch (e) {} }
 
   function mostrar(acceso) {
     $("acceso").hidden = !acceso;
@@ -140,7 +136,7 @@
     return ED.enviar("verificar", {}, c).then(function (r) {
       $("acc-btn").disabled = false;
       if (r && r.ok) {
-        clave = c; guardarClave(c); $("acc-msg").textContent = "";
+        clave = c; $("acc-msg").textContent = "";
         mostrar(false); cargarLista();
       } else {
         $("acc-msg").textContent = (r && r.error) || "La clave no es correcta.";
@@ -154,13 +150,15 @@
     verificar(c);
   });
   $("salir").addEventListener("click", function (e) {
-    e.preventDefault(); borrarClave(); clave = ""; $("clave").value = ""; mostrar(true);
+    e.preventDefault(); clave = ""; $("clave").value = ""; mostrar(true);
   });
 
   /* Lista */
   function cargarLista() {
     $("cuenta").textContent = "Cargando…";
-    ED.cargar().then(function (r) {
+    ED.enviar("listar", {}, clave).then(function (r) {
+      if (!r.ok) { $("cuenta").textContent = r.error || "No pude cargar los registros."; return; }
+      r = { datos: r.datos, fuente: "vivo" };
       datos = r.datos.slice().sort(function (a, b) {
         if (a.fecha !== b.fecha) return a.fecha < b.fecha ? 1 : -1;
         return ED.PUNTOS.indexOf(a.punto) - ED.PUNTOS.indexOf(b.punto);
@@ -268,9 +266,9 @@
     $("acc-msg").textContent = "Falta conectar el registro: pon el enlace /exec en config.js (ver LEEME.txt).";
     return;
   }
-  clave = leerClave();
+  /* La clave no se guarda en el navegador: se pide cada vez que se abre la página. */
+  clave = "";
   mostrar(true);
-  if (clave) verificar(clave);
 })();
 </script>
 </body>

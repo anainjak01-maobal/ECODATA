@@ -65,14 +65,15 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font: 16px/1.55 Georgia, "Times New Roman", serif;
+  font: 16px/1.55 "Public Sans", "Segoe UI", system-ui, sans-serif;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .sans, button, input, select, textarea, table, .chart text {
-  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-family: "Public Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
 }
 main, .wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3, .num, .kpi .val, .big { font-family: Fraunces, Georgia, "Times New Roman", serif; }
 h1, h2, h3 { text-wrap: balance; line-height: 1.2; }
 h1 { font-size: clamp(26px, 5vw, 40px); margin: 0; color: var(--green); }
 h2 { font-size: 22px; margin: 0 0 6px; color: var(--green); }
@@ -186,3 +187,25 @@ section.bloque + section.bloque { border-top: 1px solid var(--rule); margin-top:
 footer.pie { font: 13px/1.5 "Segoe UI", system-ui, sans-serif; color: var(--ink2); padding: 30px 0 40px; margin-top: 30px; border-top: 1px solid var(--rule); }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* Portada */
+.portada { padding: 44px 0 26px; background: var(--bg); }
+.portada-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 36px; align-items: center; }
+@media (max-width: 860px) { .portada-grid { grid-template-columns: 1fr; gap: 24px; } }
+.portada h1 { font-size: clamp(32px, 5.2vw, 56px); line-height: 1.04; letter-spacing: -.01em; color: var(--fg); margin: 0; font-weight: 700; }
+.portada .kicker { color: var(--accent); }
+.portada .lead { font-size: 18px; color: var(--ink2); margin: 18px 0 0; max-width: 46ch; }
+.acciones-hero { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.estado-hero { margin: 18px 0 0; }
+.estado-hero .estado { display: inline-block; font: 600 13px "Public Sans", system-ui, sans-serif; padding: 5px 11px; border: 1px solid var(--ink-soft); color: var(--ink2); }
+.burbujas { margin: 0; min-width: 0; }
+.burbujas p { margin: 0 0 8px; }
+.burbujas-svg { max-height: 360px; }
+.cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 30px; border-top: 1px solid var(--rule); }
+.cifras > div { padding: 16px 16px 4px 0; font-size: 14px; color: var(--ink2); }
+.cifras strong { display: block; font: 700 34px/1.1 Fraunces, Georgia, serif; color: var(--green); font-variant-numeric: tabular-nums; }
+@media (max-width: 620px) { .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.top { background: var(--green); margin-inline: -16px; padding-inline: 16px; }
+.top .nav { margin-top: 0; }
+.top .nav a { color: #d4e6dc; }
+.portada + .top { margin-top: 0; }

@@ -4,16 +4,36 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>EcoData · Panel de observaciones</title>
-<link rel="stylesheet" href="ecodata.css?v=2"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Public+Sans:wght@400;600;700&display=swap"/>
+<link rel="stylesheet" href="ecodata.css?v=3"/>
 </head>
 <body>
 
-<header class="top">
+<header class="portada">
+  <div class="wrap portada-grid">
+    <div class="portada-texto">
+      <p class="kicker">EcoData · I.E. N° 6 Jorge Arrieta · Maicao</p>
+      <h1>La esquina juntó más bolsas que los otros dos puntos juntos.</h1>
+      <p class="lead">Diez tardes, tres puntos alrededor de la escuela. Contamos bolsas sueltas, quema, olor y polvo, y lo pusimos en un panel que cualquiera puede leer.</p>
+      <div class="acciones-hero">
+        <a class="btn primario" href="#resumen">Ver el panel</a>
+        <a class="btn" href="#metodo">Cómo se contó</a>
+      </div>
+      <p class="estado-hero small sans"><span class="estado" id="estado" role="status">Cargando datos…</span></p>
+    </div>
+    <figure class="burbujas" aria-labelledby="t-burbujas">
+      <p id="t-burbujas" class="sans small muted">Bolsas sueltas en diez tardes. Entre más grande el círculo, más bolsas.</p>
+      <div id="burbujas"></div>
+    </figure>
+  </div>
   <div class="wrap">
-    <p class="kicker">ECODATA · PANEL DE OBSERVACIONES</p>
-    <h1 id="titulo">Diez tardes alrededor de la escuela</h1>
-    <p class="sub" id="subtitulo"></p>
-    <span class="estado" id="estado" role="status">Cargando datos…</span>
+    <div class="cifras sans" id="cifras"></div>
+  </div>
+</header>
+<div class="top">
+  <div class="wrap">
     <nav class="nav" aria-label="Secciones">
       <a href="#resumen">Resumen</a>
       <a href="#puntos">Por punto</a>
@@ -23,7 +43,7 @@
       <a href="#metodo">Método</a>
     </nav>
   </div>
-</header>
+</div>
 
 <main class="wrap">
 
@@ -161,14 +181,38 @@
   var datos = [], fuente = "respaldo", motivo = "";
   var F = { punto: "Todos", desde: "", hasta: "" };
 
-  $("titulo").textContent = (ED.CFG.PROYECTO || "EcoData").replace(/^EcoData · /, "") || "Panel";
-  $("subtitulo").textContent = ED.CFG.SUBTITULO || "";
   document.title = ED.CFG.PROYECTO || "EcoData";
 
   function pintarEstado() {
     var el = $("estado");
     if (fuente === "vivo") { el.textContent = "Datos en vivo del registro"; el.classList.remove("warn"); }
     else { el.textContent = "Datos de respaldo" + (motivo ? " · " + motivo : ""); }
+  }
+
+
+  function burbujasPortada(datos) {
+    var pp = ED.porPunto(datos);
+    var W = 520, H = 380, max = Math.max.apply(null, pp.map(function (p) { return p.total; }).concat([1]));
+    var k = 118 / Math.sqrt(max);
+    var pos = { "Portería": [120, 150], "Esquina": [350, 130], "Patio": [210, 285] };
+    var out = '<rect x="6" y="6" width="508" height="368" rx="22" fill="none" style="stroke:var(--rule)" stroke-dasharray="4 6"/>';
+    out += '<text x="22" y="34" style="fill:var(--ink2);font-size:13px;font-family:Public Sans,system-ui,sans-serif">Calle y entrada de la escuela</text>';
+    pp.forEach(function (p) {
+      var c = pos[p.punto], r = Math.max(14, Math.sqrt(p.total) * k), esq = p.punto === "Esquina";
+      out += '<g><title>' + ED.esc(p.punto + ": " + p.total + " bolsas en 10 tardes") + "</title>";
+      out += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + r + '" style="fill:' + (esq ? "var(--accent)" : "var(--neutral)") + ';fill-opacity:' + (esq ? ".92" : ".85") + '"/>';
+      out += '<text x="' + c[0] + '" y="' + (c[1] + 6) + '" text-anchor="middle" style="fill:' + (esq ? "#fff" : "var(--fg)") + ';font:700 ' + (esq ? 34 : 22) + 'px Fraunces,Georgia,serif">' + p.total + "</text>";
+      out += '<text x="' + c[0] + '" y="' + (c[1] + r + 20) + '" text-anchor="middle" style="fill:var(--fg);font:600 14px Public Sans,system-ui,sans-serif">' + ED.esc(p.punto) + "</text></g>";
+    });
+    $("burbujas").innerHTML = '<svg class="chart burbujas-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Burbujas con las bolsas de cada punto">' + out + "</svg>";
+
+    var r = ED.resumen(datos);
+    var quema = r.quemaDias;
+    $("cifras").innerHTML =
+      '<div><strong>' + ED.entero(r.tardes) + '</strong> tardes</div>' +
+      '<div><strong>' + ED.entero(r.bolsas) + '</strong> bolsas</div>' +
+      '<div><strong>' + ED.entero(quema) + '</strong> días con quema</div>' +
+      '<div><strong>3</strong> puntos</div>';
   }
 
   function kpi(lbl, val, det, destacado) {
@@ -324,6 +368,7 @@
     datos = r.datos || [];
     fuente = r.fuente; motivo = r.motivo || "";
     pintarEstado();
+    burbujasPortada(datos);
     fijarRango();
     pintarTodo();
   });
