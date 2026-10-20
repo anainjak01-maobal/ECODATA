@@ -1,0 +1,48 @@
+EcoData · Panel de observaciones (app web)
+==========================================
+
+QUÉ HAY EN LA CARPETA
+- index.html ........ Panel público: resumen, por punto, día a día, estadística, tabla y método.
+                      No pide clave. No muestra nombres de quienes anotaron.
+- registrar.html .... Registro del equipo: entrar con clave, agregar, editar y borrar observaciones.
+- config.js ......... Único archivo que se edita para conectar con la hoja (paso 3).
+- ecodata.js, ecodata.css, datos_base.js ... Partes internas. No hay que tocarlas.
+- apps-script/Codigo.gs ...... Script que guarda los datos en la hoja.
+- apps-script/observaciones_inicial.csv ... Las 30 observaciones de las diez tardes, para cargar la primera vez.
+
+PASO 1. Crear la hoja
+1. Crea una hoja de Google nueva llamada "EcoData registro".
+2. Abre Archivo > Importar > Subir y elige observaciones_inicial.csv.
+3. En "Ubicación de importación" elige "Reemplazar hoja" y en "Separador" deja el que detecte. Importa.
+4. Revisa que la pestaña se llame "Observaciones" (si no, renómbrala). Si la cambias, cambia también HOJA en Codigo.gs.
+
+PASO 2. Clave del equipo y script
+1. En la hoja, abre Extensiones > Apps Script.
+2. Borra lo que aparezca y pega el contenido de apps-script/Codigo.gs.
+3. Cambia la línea  var CLAVE = "cambia-esta-clave";  por una clave que solo conozca el equipo. Guarda (Ctrl+S).
+4. Implementar > Nueva implementación > tipo "Aplicación web":
+   - Ejecutar como: Yo
+   - Quién tiene acceso: Cualquier persona
+   Pulsa Implementar y autoriza el acceso si lo pide.
+5. Copia la dirección que termina en /exec.
+
+PASO 3. Conectar el sitio
+1. Abre config.js y pega la dirección /exec entre las comillas de REGISTRO.
+2. Sube a GitHub, en el repositorio de la app, todos los archivos de la carpeta (reemplazando los anteriores).
+3. Espera un minuto y abre el panel. Debe decir "Datos en vivo del registro" arriba.
+
+CADA VEZ QUE CAMBIES Codigo.gs
+- Implementar > Administrar implementaciones > lápiz > Versión: "Versión nueva" > Implementar.
+- La dirección /exec no cambia, así que config.js no se toca.
+
+PRUEBA RÁPIDA
+- En el navegador abre la dirección /exec: debe decir "Registro de EcoData activo."
+- Abre la misma dirección con ?datos=1 al final: debe mostrar las observaciones en JSON.
+- Entra a registrar.html con la clave. Registra una tarde de prueba, mírala en el panel y bórrala.
+
+NOTAS
+- Cada tarde y punto tiene un solo registro. Si intentas guardar otro igual, el sistema te pide editar el existente.
+- Solo bolsas entre 0 y 500, olor (No, Leve, Fuerte) y polvo (Bajo, Medio, Alto).
+- La clave protege los datos, no es una seguridad fuerte.
+- Los datos que se muestran en el panel público no incluyen quién anotó.
+- Si el panel dice "Datos de respaldo", es que no conecta con el registro: revisa config.js y la implementación.

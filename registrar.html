@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EcoData · Registro del equipo</title>
+<link rel="stylesheet" href="ecodata.css?v=1"/>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">ECODATA · SOLO PARA EL EQUIPO</p>
+    <h1>Registro de observaciones</h1>
+    <p class="sub">Anota cada tarde y cada punto. Lo que guardes aparece en el panel público, sin nombres.</p>
+    <nav class="nav" aria-label="Secciones">
+      <a href="index.html">Panel público</a>
+      <a href="#formulario" aria-current="true">Registrar</a>
+      <a href="#lista">Registros</a>
+      <a href="#" id="salir">Salir</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- Acceso: solo se muestra hasta que la clave sea correcta -->
+  <section class="bloque" id="acceso" hidden>
+    <div class="panel" style="max-width:520px;margin-top:30px">
+      <h2>Entrar al registro</h2>
+      <p class="muted small sans">Escribe la clave del equipo. El navegador la recuerda en este dispositivo.</p>
+      <form id="acc-form" class="formulario" style="grid-template-columns:1fr" autocomplete="off">
+        <label>Clave del equipo
+          <input type="password" id="clave" required/>
+        </label>
+        <div class="acciones">
+          <button class="btn primario" type="submit" id="acc-btn">Entrar</button>
+          <span class="msg" id="acc-msg" role="alert"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div id="contenido" hidden>
+
+    <section class="bloque" id="formulario" aria-labelledby="t-form">
+      <div class="encabezado">
+        <h2 id="t-form">Registrar una tarde y un punto</h2>
+        <p id="modo-form">Nuevo registro</p>
+      </div>
+      <div class="panel">
+        <form id="form" class="formulario" autocomplete="off" novalidate>
+          <input type="hidden" id="id"/>
+          <label>Fecha
+            <input type="date" id="fecha" required/>
+          </label>
+          <label>Punto
+            <select id="punto" required>
+              <option value="">Elige un punto</option>
+              <option>Portería</option><option>Esquina</option><option>Patio</option>
+            </select>
+          </label>
+          <label>Bolsas sueltas
+            <input type="number" id="bolsas" min="0" max="500" step="1" inputmode="numeric" required/>
+          </label>
+          <label>¿Se vio quema?
+            <select id="quema">
+              <option value="No">No</option>
+              <option value="Sí">Sí</option>
+            </select>
+          </label>
+          <label>Olor
+            <select id="olor">
+              <option>No</option><option>Leve</option><option>Fuerte</option>
+            </select>
+          </label>
+          <label>Polvo en el piso
+            <select id="polvo">
+              <option>Bajo</option><option>Medio</option><option>Alto</option>
+            </select>
+          </label>
+          <label>Quién anotó <span class="muted" style="font-weight:400">(solo para el equipo)</span>
+            <input type="text" id="anoto" maxlength="60"/>
+          </label>
+          <div class="acciones">
+            <button class="btn primario" type="submit" id="guardar">Guardar registro</button>
+            <button class="btn" type="button" id="cancelar" hidden>Cancelar edición</button>
+            <span class="msg" id="msg" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="bloque" id="lista" aria-labelledby="t-lista">
+      <div class="encabezado">
+        <h2 id="t-lista">Registros guardados</h2>
+        <p id="cuenta">Cargando…</p>
+      </div>
+      <div class="tabla-wrap">
+        <table class="tabla">
+          <thead><tr><th>Fecha</th><th>Punto</th><th class="n">Bolsas</th><th>Quema</th><th>Olor</th><th>Polvo</th><th>Quién anotó</th><th><span class="sr">Acciones</span></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="pie sans">Esta página guarda en la hoja de Google del proyecto. La clave protege los datos, no es una seguridad fuerte.</footer>
+</main>
+
+<script src="config.js?v=1"></script>
+<script src="datos_base.js?v=1"></script>
+<script src="ecodata.js?v=1"></script>
+<script>
+(function () {
+  "use strict";
+  var ED = window.ED, $ = function (id) { return document.getElementById(id); };
+  var CLAVE_KEY = "ecodata-clave";
+  var clave = "", datos = [], enEdicion = null;
+
+  function leerClave() { try { return localStorage.getItem(CLAVE_KEY) || ""; } catch (e) { return ""; } }
+  function guardarClave(c) { try { localStorage.setItem(CLAVE_KEY, c); } catch (e) {} }
+  function borrarClave() { try { localStorage.removeItem(CLAVE_KEY); } catch (e) {} }
+
+  function mostrar(acceso) {
+    $("acceso").hidden = !acceso;
+    $("contenido").hidden = acceso;
+  }
+
+  function msg(texto, tipo) {
+    var el = $("msg");
+    el.textContent = texto;
+    el.style.color = tipo === "error" ? "var(--accent)" : tipo === "ok" ? "var(--good)" : "var(--ink2)";
+  }
+
+  /* Acceso */
+  function verificar(c) {
+    $("acc-btn").disabled = true; $("acc-msg").textContent = "Revisando la clave…";
+    return ED.enviar("verificar", {}, c).then(function (r) {
+      $("acc-btn").disabled = false;
+      if (r && r.ok) {
+        clave = c; guardarClave(c); $("acc-msg").textContent = "";
+        mostrar(false); cargarLista();
+      } else {
+        $("acc-msg").textContent = (r && r.error) || "La clave no es correcta.";
+      }
+    });
+  }
+  $("acc-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var c = $("clave").value.trim();
+    if (!c) { $("acc-msg").textContent = "Escribe la clave."; return; }
+    verificar(c);
+  });
+  $("salir").addEventListener("click", function (e) {
+    e.preventDefault(); borrarClave(); clave = ""; $("clave").value = ""; mostrar(true);
+  });
+
+  /* Lista */
+  function cargarLista() {
+    $("cuenta").textContent = "Cargando…";
+    ED.cargar().then(function (r) {
+      datos = r.datos.slice().sort(function (a, b) {
+        if (a.fecha !== b.fecha) return a.fecha < b.fecha ? 1 : -1;
+        return ED.PUNTOS.indexOf(a.punto) - ED.PUNTOS.indexOf(b.punto);
+      });
+      $("cuenta").textContent = datos.length + " registros · " + (r.fuente === "vivo" ? "datos en vivo" : "datos de respaldo, revisa el registro");
+      pintarLista();
+    });
+  }
+  function pintarLista() {
+    var tb = $("tbody"); tb.innerHTML = "";
+    if (!datos.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="muted">Todavía no hay registros. Usa el formulario de arriba para anotar la primera tarde.</td></tr>';
+      return;
+    }
+    datos.forEach(function (r) {
+      var tr = document.createElement("tr");
+      var celdas = [ED.fechaLarga(r.fecha), r.punto, ED.entero(r.bolsas), r.quema ? "Sí" : "No", r.olor, r.polvo, r.anoto || "–"];
+      celdas.forEach(function (c, i) {
+        var td = document.createElement("td");
+        if (i === 2) td.className = "n";
+        td.textContent = c;
+        tr.appendChild(td);
+      });
+      var td = document.createElement("td");
+      td.style.whiteSpace = "nowrap";
+      var ed = document.createElement("button");
+      ed.type = "button"; ed.className = "btn pequeno"; ed.textContent = "Editar";
+      ed.addEventListener("click", function () { cargarEnFormulario(r); });
+      var bo = document.createElement("button");
+      bo.type = "button"; bo.className = "btn pequeno peligro"; bo.textContent = "Borrar";
+      bo.addEventListener("click", function () { confirmarBorrado(bo, r); });
+      td.appendChild(ed); td.appendChild(document.createTextNode(" ")); td.appendChild(bo);
+      tr.appendChild(td);
+      tb.appendChild(tr);
+    });
+  }
+  function confirmarBorrado(boton, r) {
+    if (boton.dataset.listo !== "1") {
+      boton.dataset.listo = "1"; boton.textContent = "¿Seguro?";
+      setTimeout(function () { boton.dataset.listo = ""; boton.textContent = "Borrar"; }, 4000);
+      return;
+    }
+    boton.disabled = true; boton.textContent = "Borrando…";
+    ED.enviar("borrar", { id: r.id }, clave).then(function (res) {
+      if (res.ok) { msg("Registro borrado.", "ok"); cargarLista(); }
+      else { msg(res.error || "No se pudo borrar.", "error"); boton.disabled = false; boton.textContent = "Borrar"; }
+    });
+  }
+
+  /* Formulario */
+  function cargarEnFormulario(r) {
+    enEdicion = r;
+    $("id").value = r.id; $("fecha").value = r.fecha; $("punto").value = r.punto;
+    $("bolsas").value = r.bolsas; $("quema").value = r.quema ? "Sí" : "No";
+    $("olor").value = r.olor; $("polvo").value = r.polvo; $("anoto").value = r.anoto || "";
+    $("modo-form").textContent = "Editando " + r.id + " · " + ED.fechaLarga(r.fecha) + " · " + r.punto;
+    $("cancelar").hidden = false; $("guardar").textContent = "Guardar cambios";
+    msg("", "");
+    location.hash = "#formulario";
+  }
+  function limpiarFormulario() {
+    enEdicion = null;
+    $("form").reset(); $("id").value = "";
+    $("fecha").value = ED.hoy();
+    $("modo-form").textContent = "Nuevo registro";
+    $("cancelar").hidden = true; $("guardar").textContent = "Guardar registro";
+  }
+  $("cancelar").addEventListener("click", function () { limpiarFormulario(); msg("", ""); });
+
+  function validarLocal() {
+    if (!$("fecha").value) return "Elige la fecha.";
+    if (!$("punto").value) return "Elige el punto.";
+    var b = $("bolsas").value;
+    if (b === "" || isNaN(Number(b)) || Number(b) < 0 || Math.floor(Number(b)) !== Number(b)) return "Las bolsas deben ser un número entero, sin decimales.";
+    return "";
+  }
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = validarLocal();
+    if (err) { msg(err, "error"); return; }
+    var payload = {
+      fecha: $("fecha").value, punto: $("punto").value, bolsas: Number($("bolsas").value),
+      quema: $("quema").value === "Sí", olor: $("olor").value, polvo: $("polvo").value,
+      anoto: $("anoto").value.trim()
+    };
+    var editando = !!enEdicion;
+    if (editando) payload.id = $("id").value;
+    $("guardar").disabled = true; msg("Guardando…", "");
+    ED.enviar(editando ? "actualizar" : "registrar", payload, clave).then(function (r) {
+      $("guardar").disabled = false;
+      if (r.ok) {
+        msg(r.mensaje || "Guardado.", "ok");
+        limpiarFormulario();
+        cargarLista();
+      } else {
+        msg(r.error || "No se pudo guardar.", "error");
+      }
+    });
+  });
+
+  /* Arranque */
+  limpiarFormulario();
+  if (!ED.CFG.REGISTRO) {
+    mostrar(true);
+    $("acc-msg").textContent = "Falta conectar el registro: pon el enlace /exec en config.js (ver LEEME.txt).";
+    return;
+  }
+  clave = leerClave();
+  mostrar(true);
+  if (clave) verificar(clave);
+})();
+</script>
+</body>
+</html>

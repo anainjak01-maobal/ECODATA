@@ -1,0 +1,31 @@
+ID,Fecha,Día,Punto,Bolsas,Quema,Olor,Polvo,Anotó,Creado
+E01,2026-09-01,Martes,Portería,2,No,No,Bajo,Miller,2026-09-15
+E02,2026-09-01,Martes,Esquina,8,No,Leve,Bajo,Abias,2026-09-15
+E03,2026-09-01,Martes,Patio,3,No,No,Bajo,Juan José,2026-09-15
+E04,2026-09-02,Miércoles,Portería,1,No,No,Bajo,Miller,2026-09-15
+E05,2026-09-02,Miércoles,Esquina,6,No,Leve,Bajo,Abias,2026-09-15
+E06,2026-09-02,Miércoles,Patio,2,No,No,Bajo,Juan José,2026-09-15
+E07,2026-09-03,Jueves,Portería,3,No,Leve,Medio,Miller,2026-09-15
+E08,2026-09-03,Jueves,Esquina,11,Sí,Fuerte,Medio,Abias,2026-09-15
+E09,2026-09-03,Jueves,Patio,4,No,Leve,Medio,Juan José,2026-09-15
+E10,2026-09-04,Viernes,Portería,2,No,No,Bajo,Miller,2026-09-15
+E11,2026-09-04,Viernes,Esquina,7,No,Leve,Bajo,Abias,2026-09-15
+E12,2026-09-04,Viernes,Patio,3,No,No,Bajo,Juan José,2026-09-15
+E13,2026-09-07,Lunes,Portería,1,No,No,Medio,Miller,2026-09-15
+E14,2026-09-07,Lunes,Esquina,9,No,Leve,Medio,Abias,2026-09-15
+E15,2026-09-07,Lunes,Patio,2,No,No,Medio,Juan José,2026-09-15
+E16,2026-09-08,Martes,Portería,4,No,Leve,Alto,Miller,2026-09-15
+E17,2026-09-08,Martes,Esquina,14,Sí,Fuerte,Alto,Abias,2026-09-15
+E18,2026-09-08,Martes,Patio,5,No,Leve,Alto,Juan José,2026-09-15
+E19,2026-09-09,Miércoles,Portería,2,No,No,Bajo,Miller,2026-09-15
+E20,2026-09-09,Miércoles,Esquina,6,No,No,Bajo,Abias,2026-09-15
+E21,2026-09-09,Miércoles,Patio,2,No,No,Bajo,Juan José,2026-09-15
+E22,2026-09-10,Jueves,Portería,1,No,No,Medio,Miller,2026-09-15
+E23,2026-09-10,Jueves,Esquina,8,No,Leve,Medio,Abias,2026-09-15
+E24,2026-09-10,Jueves,Patio,3,No,No,Medio,Juan José,2026-09-15
+E25,2026-09-11,Viernes,Portería,3,No,Leve,Alto,Miller,2026-09-15
+E26,2026-09-11,Viernes,Esquina,12,Sí,Fuerte,Alto,Abias,2026-09-15
+E27,2026-09-11,Viernes,Patio,4,No,Leve,Alto,Juan José,2026-09-15
+E28,2026-09-14,Lunes,Portería,2,No,No,Bajo,Miller,2026-09-15
+E29,2026-09-14,Lunes,Esquina,7,No,Leve,Bajo,Abias,2026-09-15
+E30,2026-09-14,Lunes,Patio,2,No,No,Bajo,Juan José,2026-09-15

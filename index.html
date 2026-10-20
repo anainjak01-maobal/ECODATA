@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EcoData · Panel de observaciones</title>
+<link rel="stylesheet" href="ecodata.css?v=1"/>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">ECODATA · PANEL DE OBSERVACIONES</p>
+    <h1 id="titulo">Diez tardes alrededor de la escuela</h1>
+    <p class="sub" id="subtitulo"></p>
+    <span class="estado" id="estado" role="status">Cargando datos…</span>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#resumen">Resumen</a>
+      <a href="#puntos">Por punto</a>
+      <a href="#fechas">Día a día</a>
+      <a href="#estadistica">Estadística</a>
+      <a href="#tabla">Tabla</a>
+      <a href="#metodo">Método</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="filtros sans" role="search" aria-label="Filtros">
+    <label>Punto
+      <select id="f-punto">
+        <option value="Todos">Todos los puntos</option>
+        <option>Portería</option><option>Esquina</option><option>Patio</option>
+      </select>
+    </label>
+    <label>Desde
+      <input type="date" id="f-desde"/>
+    </label>
+    <label>Hasta
+      <input type="date" id="f-hasta"/>
+    </label>
+    <button class="btn" type="button" id="f-todo">Todo el periodo</button>
+    <span class="resumen-filtro" id="f-resumen"></span>
+  </div>
+  <p class="small muted sans" style="margin:8px 0 0">El filtro de punto cambia el resumen y la tabla. Las comparaciones entre puntos usan el periodo elegido.</p>
+
+  <section class="bloque" id="resumen" aria-labelledby="t-resumen">
+    <div class="encabezado">
+      <h2 id="t-resumen">Resumen</h2>
+      <p>Lo que se contó en el periodo elegido.</p>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="dos">
+      <div class="panel">
+        <h3>Bolsas sueltas por punto</h3>
+        <p class="nota">Total del periodo. La barra terracota es el punto con más bolsas.</p>
+        <div id="barras-puntos"></div>
+      </div>
+      <div class="panel">
+        <h3>Lectura rápida</h3>
+        <div id="lectura" class="sans" style="font-size:15px;line-height:1.5"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque" id="puntos" aria-labelledby="t-puntos">
+    <div class="encabezado">
+      <h2 id="t-puntos">Por punto</h2>
+      <p>Cómo se comporta cada punto tarde a tarde.</p>
+    </div>
+    <div class="panel">
+      <h3>Bolsas por tarde en cada punto</h3>
+      <p class="nota">Cada punto tiene su propia línea. Patio va punteado, para distinguirlo sin depender del color.</p>
+      <div class="scroll" id="grafico-lineas"></div>
+      <div class="leyenda sans" id="leyenda-lineas"></div>
+    </div>
+    <div class="tabla-wrap" style="margin-top:16px" id="tabla-puntos"></div>
+  </section>
+
+  <section class="bloque" id="fechas" aria-labelledby="t-fechas">
+    <div class="encabezado">
+      <h2 id="t-fechas">Día a día</h2>
+      <p>Cada grupo de barras es una tarde. La marca de quema indica que se vio quemar basura ese día.</p>
+    </div>
+    <div class="panel">
+      <div class="scroll" id="grafico-columnas"></div>
+      <div class="leyenda sans">
+        <span><i class="sw" style="background:var(--neutral)"></i>Portería</span>
+        <span><i class="sw" style="background:var(--accent)"></i>Esquina</span>
+        <span><i class="sw" style="background:var(--neutral-2)"></i>Patio</span>
+        <span>Bolsas sueltas por tarde</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque" id="estadistica" aria-labelledby="t-est">
+    <div class="encabezado">
+      <h2 id="t-est">Estadística</h2>
+      <p>Las preguntas que se pueden responder con estos datos, y qué tan firme es cada respuesta.</p>
+    </div>
+    <div id="alerta-est"></div>
+    <div class="panel" style="margin-top:14px">
+      <h3>¿Hay más bolsas en la esquina los días de quema?</h3>
+      <p class="nota">Promedio de bolsas en la esquina, en días con quema y sin quema. La barra horizontal es el rango probable del 95 %, calculado con 4.000 remuestreos.</p>
+      <div id="grafico-est"></div>
+      <div id="texto-est" class="sans" style="font-size:15px;margin-top:10px"></div>
+    </div>
+    <div class="dos">
+      <div class="panel">
+        <h3>Bolsas según el polvo en el piso</h3>
+        <p class="nota">Promedio de bolsas por registro, según el nivel de polvo que anotó el equipo.</p>
+        <div id="grafico-polvo"></div>
+      </div>
+      <div class="panel">
+        <h3>Olor y quema</h3>
+        <p class="nota">Cuántos registros tienen cada nivel de olor, separados por días con y sin quema.</p>
+        <div class="tabla-wrap" id="tabla-cruce"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloque" id="tabla" aria-labelledby="t-tabla">
+    <div class="encabezado">
+      <h2 id="t-tabla">Tabla de registros</h2>
+      <p>Usa los filtros de arriba. Puedes descargar lo que ves.</p>
+    </div>
+    <div class="seg sans" style="margin-bottom:12px">
+      <button class="btn pequeno" type="button" id="btn-csv">Descargar CSV</button>
+      <span class="muted small" id="cuenta-tabla" style="align-self:center"></span>
+    </div>
+    <div class="tabla-wrap">
+      <table class="tabla">
+        <thead><tr><th>Fecha</th><th>Día</th><th>Punto</th><th class="n">Bolsas</th><th>Quema</th><th>Olor</th><th>Polvo</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="bloque" id="metodo" aria-labelledby="t-metodo">
+    <div class="encabezado">
+      <h2 id="t-metodo">Método y límites</h2>
+    </div>
+    <div class="panel">
+      <p>Se hizo un conteo sencillo en tres puntos del entorno de la escuela. Cada tarde, durante quince minutos por punto, el equipo anotó las bolsas sueltas, si se vio quema, el olor y el polvo en el piso.</p>
+      <p>Esto no es una estación del IDEAM ni una medición de la calidad del aire. Sirve para señalar dónde mirar, con fechas concretas.</p>
+      <p>Con pocos días, cualquier diferencia puede ser casualidad. Por eso la estadística muestra rangos probables y no solo promedios. Los nombres de quienes anotaron no se publican.</p>
+    </div>
+  </section>
+
+  <footer class="pie sans">EcoData · Conteo propio del equipo. Datos del registro de observaciones.</footer>
+</main>
+
+<script src="config.js?v=1"></script>
+<script src="datos_base.js?v=1"></script>
+<script src="ecodata.js?v=1"></script>
+<script>
+(function () {
+  "use strict";
+  var ED = window.ED, $ = function (id) { return document.getElementById(id); };
+  var datos = [], fuente = "respaldo", motivo = "";
+  var F = { punto: "Todos", desde: "", hasta: "" };
+
+  $("titulo").textContent = (ED.CFG.PROYECTO || "EcoData").replace(/^EcoData · /, "") || "Panel";
+  $("subtitulo").textContent = ED.CFG.SUBTITULO || "";
+  document.title = ED.CFG.PROYECTO || "EcoData";
+
+  function pintarEstado() {
+    var el = $("estado");
+    if (fuente === "vivo") { el.textContent = "Datos en vivo del registro"; el.classList.remove("warn"); }
+    else { el.textContent = "Datos de respaldo" + (motivo ? " · " + motivo : ""); }
+  }
+
+  function kpi(lbl, val, det, destacado) {
+    return '<div class="kpi' + (destacado ? " destacado" : "") + '"><div class="lbl">' + lbl + '</div><div class="val">' + val + '</div><div class="det">' + det + "</div></div>";
+  }
+
+  function pintarResumen(rowsPunto, rowsFechas) {
+    var r = ED.resumen(rowsPunto);
+    var quemaTxt = r.quemaIC ? "Rango probable " + ED.pct(r.quemaIC[0]) + " a " + ED.pct(r.quemaIC[1]) : "";
+    $("kpis").innerHTML =
+      kpi("Tardes registradas", ED.entero(r.tardes), r.filas + " registros (tarde por punto)") +
+      kpi("Bolsas sueltas", ED.entero(r.bolsas), "Promedio " + ED.dec(r.promFila) + " por registro", true) +
+      kpi("Tardes con quema", ED.entero(r.quemaDias), quemaTxt) +
+      kpi("Registros con olor fuerte", ED.entero(r.olorFuerte), "De " + r.filas + " registros");
+
+    var pp = ED.porPunto(rowsFechas);
+    var maxTot = Math.max.apply(null, pp.map(function (p) { return p.total; }));
+    $("barras-puntos").innerHTML = ED.barrasH(pp.map(function (p) {
+      return { etiqueta: p.punto, valor: p.total, unidad: "bolsas", destacado: p.total === maxTot && p.total > 0 };
+    }), "Bolsas por punto");
+
+    var esq = pp.filter(function (p) { return p.punto === "Esquina"; })[0];
+    var otros = pp.filter(function (p) { return p.punto !== "Esquina"; });
+    var sumaOtros = otros.reduce(function (s, p) { return s + p.total; }, 0);
+    var txt = [];
+    if (rowsFechas.length) {
+      txt.push("<p>La esquina juntó <strong>" + ED.entero(esq.total) + "</strong> bolsas. Los otros dos puntos juntos, <strong>" + ED.entero(sumaOtros) + "</strong>.</p>");
+      txt.push("<p>Se vio quemar basura en <strong>" + ED.entero(esq.quemaDias) + "</strong> tardes, y todas fueron en la esquina.</p>");
+      txt.push("<p class=\"muted\">Esto muestra dónde mirar. No prueba la causa de lo que pasa.</p>");
+    } else {
+      txt.push("<p>No hay registros en este periodo. Cambia las fechas o el punto.</p>");
+    }
+    $("lectura").innerHTML = txt.join("");
+  }
+
+  function pintarPuntos(rowsFechas) {
+    var fechas = ED.fechasOrdenadas(rowsFechas);
+    $("grafico-lineas").innerHTML = fechas.length ? ED.lineas(fechas, rowsFechas, "Bolsas por tarde en cada punto") : "<p class=\"muted\">Sin datos en el periodo.</p>";
+    $("leyenda-lineas").innerHTML =
+      '<span><i class="sw linea" style="background:var(--ink-soft)"></i>Portería</span>' +
+      '<span><i class="sw linea" style="background:var(--accent)"></i>Esquina</span>' +
+      '<span><i class="sw linea" style="background:repeating-linear-gradient(90deg,var(--ink2) 0 6px,transparent 6px 10px)"></i>Patio</span>';
+    var pp = ED.porPunto(rowsFechas);
+    var filas = pp.map(function (p) {
+      return "<tr><td>" + ED.esc(p.punto) + '</td><td class="n">' + ED.entero(p.filas) + '</td><td class="n">' + ED.entero(p.total) +
+        '</td><td class="n">' + ED.dec(p.prom) + '</td><td class="n">' + ED.entero(p.max) + '</td><td class="n">' + ED.entero(p.quemaDias) + "</td></tr>";
+    }).join("");
+    $("tabla-puntos").innerHTML = '<table class="tabla"><thead><tr><th>Punto</th><th class="n">Registros</th><th class="n">Bolsas</th><th class="n">Promedio por registro</th><th class="n">Máximo en una tarde</th><th class="n">Tardes con quema</th></tr></thead><tbody>' + filas + "</tbody></table>";
+  }
+
+  function pintarFechas(rowsFechas) {
+    var fechas = ED.fechasOrdenadas(rowsFechas);
+    $("grafico-columnas").innerHTML = fechas.length ? ED.columnas(fechas, rowsFechas, "Bolsas por día y punto") : "<p class=\"muted\">Sin datos en el periodo.</p>";
+  }
+
+  function pintarEstadistica(rowsFechas) {
+    var esq = rowsFechas.filter(function (r) { return r.punto === "Esquina"; });
+    var con = esq.filter(function (r) { return r.quema; }).map(function (r) { return r.bolsas; });
+    var sin = esq.filter(function (r) { return !r.quema; }).map(function (r) { return r.bolsas; });
+    var alerta = "";
+    if (con.length < 5 || sin.length < 5) {
+      alerta = '<div class="aviso warn">Hay pocos días en uno de los grupos (' + con.length + " con quema y " + sin.length + " sin quema). Con tan pocos datos, los rangos son poco confiables. Sigue contando.</div>";
+    }
+    $("alerta-est").innerHTML = alerta;
+    if (con.length && sin.length) {
+      var mc = ED.media(con), ms = ED.media(sin), dif = mc - ms;
+      var icC = ED.ic95(con, 20260915), icS = ED.ic95(sin, 20260916), icD = ED.icDiferencia(con, sin, 20260917);
+      $("grafico-est").innerHTML = ED.intervalos([
+        { etiqueta: "Con quema (" + con.length + " días)", media: mc, ic: icC, color: "var(--accent)" },
+        { etiqueta: "Sin quema (" + sin.length + " días)", media: ms, ic: icS, color: "var(--ink-soft)" }
+      ], "Promedio y rango probable en la esquina");
+      var signo = dif >= 0 ? "más" : "menos";
+      var t = "<p>En los días con quema, la esquina tuvo en promedio <strong>" + ED.dec(Math.abs(dif)) + " bolsas " + signo + "</strong> que en los días sin quema.</p>";
+      if (icD) {
+        var cruza = icD[0] <= 0 && icD[1] >= 0;
+        t += "<p>Rango probable de esa diferencia: de " + ED.dec(icD[0]) + " a " + ED.dec(icD[1]) + " bolsas. " +
+          (cruza ? "El rango incluye el cero, así que con estos datos no se puede descartar que sea casualidad."
+                 : "El rango no incluye el cero: la diferencia es consistente con estos datos.") + "</p>";
+      }
+      t += '<p class="muted small">Esto muestra una relación, no una causa. Con pocos días, el rango puede ser más estrecho de lo que es en realidad.</p>';
+      $("texto-est").innerHTML = t;
+    } else {
+      $("grafico-est").innerHTML = "";
+      $("texto-est").innerHTML = "<p class=\"muted\">Se necesitan días con y sin quema en la esquina para comparar. Cambia el periodo.</p>";
+    }
+
+    var pol = ED.porNivel(rowsFechas, "polvo", ED.POLVOS);
+    var maxP = pol.reduce(function (m, p) { return p.prom != null && p.prom > m.prom ? p : m; }, { prom: -1, nivel: "" });
+    $("grafico-polvo").innerHTML = ED.barrasV(pol.map(function (p) {
+      return { etiqueta: p.nivel, valor: p.prom || 0, n: p.n, destacado: p.nivel === maxP.nivel };
+    }), "Promedio de bolsas según el polvo");
+
+    var cr = ED.cruce(rowsFechas);
+    var filasCr = cr.map(function (c) {
+      return "<tr><td>" + ED.esc(c.olor) + '</td><td class="n">' + c.conQuema + '</td><td class="n">' + c.sinQuema + "</td></tr>";
+    }).join("");
+    $("tabla-cruce").innerHTML = '<table class="tabla"><thead><tr><th>Olor</th><th class="n">Con quema</th><th class="n">Sin quema</th></tr></thead><tbody>' + filasCr + "</tbody></table>";
+  }
+
+  function filasTabla(rows) {
+    return rows.slice().sort(function (a, b) {
+      if (a.fecha !== b.fecha) return a.fecha < b.fecha ? -1 : 1;
+      return ED.PUNTOS.indexOf(a.punto) - ED.PUNTOS.indexOf(b.punto);
+    });
+  }
+
+  var filtradasTabla = [];
+  function pintarTabla(rowsPunto) {
+    filtradasTabla = filasTabla(rowsPunto);
+    $("tbody").innerHTML = ED.tablaHtml(filtradasTabla);
+    $("cuenta-tabla").textContent = filtradasTabla.length + " registros";
+  }
+
+  function pintarTodo() {
+    var rowsFechas = ED.filtrar(datos, F, false);
+    var rowsPunto = ED.filtrar(datos, F, true);
+    pintarResumen(rowsPunto, rowsFechas);
+    pintarPuntos(rowsFechas);
+    pintarFechas(rowsFechas);
+    pintarEstadistica(rowsFechas);
+    pintarTabla(rowsPunto);
+    var resumenTxt = rowsFechas.length ? ED.fechaLarga(ED.fechasOrdenadas(rowsFechas)[0]) + " a " + ED.fechaLarga(ED.fechasOrdenadas(rowsFechas).slice(-1)[0]) : "Sin datos";
+    $("f-resumen").textContent = resumenTxt;
+  }
+
+  function fijarRango() {
+    var fechas = ED.unicos(datos.map(function (r) { return r.fecha; })).sort();
+    if (!fechas.length) return;
+    $("f-desde").min = $("f-hasta").min = fechas[0];
+    $("f-desde").max = $("f-hasta").max = fechas[fechas.length - 1];
+    F.desde = fechas[0]; F.hasta = fechas[fechas.length - 1];
+    $("f-desde").value = F.desde; $("f-hasta").value = F.hasta;
+  }
+
+  $("f-punto").addEventListener("change", function (e) { F.punto = e.target.value; pintarTodo(); });
+  $("f-desde").addEventListener("change", function (e) { F.desde = e.target.value; pintarTodo(); });
+  $("f-hasta").addEventListener("change", function (e) { F.hasta = e.target.value; pintarTodo(); });
+  $("f-todo").addEventListener("click", function () { fijarRango(); pintarTodo(); });
+  $("btn-csv").addEventListener("click", function () {
+    ED.descargar("ecodata-observaciones.csv", ED.csv(filtradasTabla));
+  });
+
+  function marcarNav() {
+    var h = location.hash || "#resumen";
+    document.querySelectorAll(".nav a").forEach(function (a) {
+      a.setAttribute("aria-current", a.getAttribute("href") === h ? "true" : "false");
+    });
+  }
+  window.addEventListener("hashchange", marcarNav);
+  marcarNav();
+
+  ED.cargar().then(function (r) {
+    datos = r.datos || [];
+    fuente = r.fuente; motivo = r.motivo || "";
+    pintarEstado();
+    fijarRango();
+    pintarTodo();
+  });
+})();
+</script>
+</body>
+</html>
