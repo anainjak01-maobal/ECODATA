@@ -9,6 +9,7 @@ var PUNTOS = ["Portería", "Esquina", "Patio"];
 var OLORES = ["No", "Leve", "Fuerte"];
 var POLVOS = ["Bajo", "Medio", "Alto"];
 var CABECERA = ["ID", "Fecha", "Día", "Punto", "Bolsas", "Quema", "Olor", "Polvo", "Anotó", "Creado"];
+var ZONA = "America/Bogota";
 var DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 /* Lectura pública: ?datos=1 devuelve las observaciones sin el nombre de quien anotó. */
@@ -61,7 +62,7 @@ function hoja() {
 }
 
 function texto(v) {
-  if (v instanceof Date) return Utilities.formatDate(v, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
+  if (v instanceof Date) return Utilities.formatDate(v, ZONA, "yyyy-MM-dd");
   return String(v == null ? "" : v).trim();
 }
 
@@ -97,7 +98,7 @@ function filaDesde(p, id) {
   return [id, texto(p.fecha), DIAS[d.getDay()], texto(p.punto), Number(p.bolsas),
           (p.quema === true || texto(p.quema) === "Sí" || texto(p.quema) === "true") ? "Sí" : "No",
           texto(p.olor), texto(p.polvo), texto(p.anoto).slice(0, 60),
-          Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm")];
+          Utilities.formatDate(new Date(), ZONA, "yyyy-MM-dd HH:mm")];
 }
 
 /* Busca la fila de una tarde y punto. Devuelve el número de fila de la hoja o 0. */
