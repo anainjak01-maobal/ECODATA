@@ -3,7 +3,7 @@
    Cambia CLAVE por una clave que solo conozca el equipo.
    Después de cada cambio: Implementar > Administrar implementaciones > Versión nueva.
    ============================================================ */
-var CLAVE = "cambia-esta-clave";
+var CLAVE = "Eco12345";
 var HOJA = "Observaciones";
 var PUNTOS = ["Portería", "Esquina", "Patio"];
 var OLORES = ["No", "Leve", "Fuerte"];
