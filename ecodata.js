@@ -280,17 +280,17 @@
 
   /* ---------- Tabla ---------- */
   function tablaHtml(rows) {
-    if (!rows.length) return '<tr><td colspan="7" class="muted">No hay registros con estos filtros.</td></tr>';
+    if (!rows.length) return '<tr><td colspan="8" class="muted">No hay registros con estos filtros.</td></tr>';
     return rows.map(function (r) {
       return "<tr><td>" + fechaLarga(r.fecha) + "</td><td>" + esc(r.dia) + "</td><td>" + esc(r.punto) +
         '</td><td class="n">' + entero(r.bolsas) + "</td><td>" + (r.quema ? '<span class="pill">Sí</span>' : "No") +
-        "</td><td>" + esc(r.olor) + "</td><td>" + esc(r.polvo) + "</td></tr>";
+        "</td><td>" + esc(r.olor) + "</td><td>" + esc(r.polvo) + "</td><td>" + esc(r.anoto || "–") + "</td></tr>";
     }).join("");
   }
   function csv(rows) {
-    var cab = ["ID", "Fecha", "Día", "Punto", "Bolsas", "Quema", "Olor", "Polvo"];
+    var cab = ["ID", "Fecha", "Día", "Punto", "Bolsas", "Quema", "Olor", "Polvo", "Anotó"];
     var lineas = [cab.join(";")].concat(rows.map(function (r) {
-      return [r.id, r.fecha, r.dia, r.punto, r.bolsas, r.quema ? "Sí" : "No", r.olor, r.polvo].map(function (c) {
+      return [r.id, r.fecha, r.dia, r.punto, r.bolsas, r.quema ? "Sí" : "No", r.olor, r.polvo, r.anoto || ""].map(function (c) {
         var s = String(c == null ? "" : c);
         return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
       }).join(";");
